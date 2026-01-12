@@ -2,6 +2,7 @@ package com.serenitydojo.playwright;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
+import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -84,6 +85,15 @@ public class PlaywrightLocatorsTest {
         void byLabel() {
             page.getByText("Sign in").click();
             page.getByLabel("Email address *").fill("example@example.com");
+        }
+
+
+        @DisplayName("Using elements by role")
+        @Test
+        // ARIA - Accessible Rich Internet Application
+        void byRole() {
+            page.getByRole(AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Search ")).click();
         }
     }
 }
