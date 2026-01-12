@@ -78,5 +78,12 @@ public class PlaywrightLocatorsTest {
 
             page.getByTitle("Practice Software Testing - Toolshop").click();
         }
+
+        @DisplayName("Using label")
+        @Test
+        void byLabel() {
+            page.getByText("Sign in").click();
+            page.getByLabel("Email address *").fill("example@example.com");
+        }
     }
 }
