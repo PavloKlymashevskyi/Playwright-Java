@@ -8,6 +8,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class PlaywrightLocatorsTest {
@@ -102,6 +103,26 @@ public class PlaywrightLocatorsTest {
         void testID() {
             playwright.selectors().setTestIdAttribute("data-test");
             page.getByTestId("nav-sign-in").click(); //Hand Tools
+        }
+
+        @DisplayName("Working with collections")
+        @Test
+        void collections() {
+            int itemsOnThePage = page.locator(".card").count();
+            page.locator(".card").first().count();
+            page.locator(".card").nth(1).count();
+            page.locator(".card").last().count();
+
+            playwright.selectors().setTestIdAttribute("data-test");
+            List<String> ItemNames = page.getByTestId("product-name").allTextContents();
+        }
+
+        @DisplayName("Working with css Selectors")
+        @Test
+        void cssSelectors() {
+            page.getByText("Sign in").click();
+            page.locator("form input[type='email']").fill("admin@example.com");
+            page.locator(".btnSubmit").click();
         }
     }
 }
