@@ -51,7 +51,7 @@ public class PlaywrightLocatorsTest {
 
     @DisplayName("Locating elements  by text")
     @Nested
-    class LocateElementsByText {
+    class LocateElementsBy {
         @BeforeEach
         void openTheCatalogPage() {
             openPage();
@@ -123,6 +123,39 @@ public class PlaywrightLocatorsTest {
             page.getByText("Sign in").click();
             page.locator("form input[type='email']").fill("admin@example.com");
             page.locator(".btnSubmit").click();
+        }
+    }
+
+    @DisplayName("Locating elements using CSS")
+    @Nested
+    class LocateElementsByCss {
+        @BeforeEach
+        void openContactPage() {
+            page.navigate("https://practicesoftwaretesting.com/contact");
+        }
+
+        @DisplayName("By id")
+        @Test
+        void locateTheFirstNameFieldByID() {
+            page.locator("#first_name").fill("John");
+            PlaywrightAssertions.assertThat(page.locator("#first_name")).hasValue("John");
+        }
+
+        @DisplayName("By CSS class")
+        @Test
+        void locateTheSendButtonByCSSClass() {
+            page.locator("#first_name").fill("John");
+            page.locator(".btnSubmit").click();
+            List<String> alertMessages = page.locator(".alert").allTextContents();
+            Assertions.assertTrue(!alertMessages.isEmpty());
+        }
+
+        @DisplayName("By attribute")
+        @Test
+        void locateTheSendButtonByAttribute() {
+            page.locator("input[placeholder='Your last name *']").fill("Test");
+            PlaywrightAssertions.assertThat(page.locator("#last_name")).hasValue("Test");
+
         }
     }
 }
