@@ -95,5 +95,13 @@ public class PlaywrightLocatorsTest {
             page.getByRole(AriaRole.BUTTON,
                     new Page.GetByRoleOptions().setName("Search ")).click();
         }
+
+        @DisplayName("Using Test IDs")
+        @Test
+            // A specific attribute("e.g.: "data-testid"), but we have data-test
+        void testID() {
+            playwright.selectors().setTestIdAttribute("data-test");
+            page.getByTestId("nav-sign-in").click(); //Hand Tools
+        }
     }
 }
