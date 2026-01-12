@@ -1,33 +1,23 @@
 package com.serenitydojo.playwright;
 
-import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.junit.UsePlaywright;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+@UsePlaywright
 public class ASimplePlaywrightTest {
     @Test
-    public void shouldShowThePageTitle() {
-        Playwright playwright = Playwright.create();
-        Browser browser = playwright.chromium().launch();
-        Page page = browser.newPage();
+    public void shouldShowThePageTitle(Page page) {
 
         page.navigate("https://practicesoftwaretesting.com/");
-
         String title = page.title();
-
         Assertions.assertTrue(title.contains("Practice Software Testing "));
 
-        browser.close();
-        playwright.close();
     }
 
     @Test
-    public void shouldSearchByKeyword() {
-        Playwright playwright = Playwright.create();
-        Browser browser = playwright.chromium().launch();
-        Page page = browser.newPage();
+    public void shouldSearchByKeyword(Page page) {
 
         page.navigate("https://practicesoftwaretesting.com/");
         page.locator("#search-query").fill("Pliers");
@@ -36,7 +26,6 @@ public class ASimplePlaywrightTest {
         int matchingSearchResults = page.locator(".card").count();
         Assertions.assertTrue(matchingSearchResults > 0);
 
-        browser.close();
-        playwright.close();
     }
+
 }
