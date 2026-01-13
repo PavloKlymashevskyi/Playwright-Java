@@ -1,6 +1,7 @@
 package com.serenitydojo.playwright;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.SelectOption;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
@@ -54,20 +55,21 @@ public class PlaywrightFormsTest {
             var firstNameField = page.getByLabel("First Name");
             var lastNameField = page.getByLabel("Last Name");
             var emailNameField = page.getByLabel("Email");
-            var mesageField = page.getByLabel("Message");
+            var messageField = page.getByLabel("Message");
+            var subjectField = page.getByLabel("Subject");
 
             firstNameField.fill("Sara-Jane");
             lastNameField.fill("Smith");
             emailNameField.fill("example@example.com");
-            mesageField.fill("Hello World");
+            messageField.fill("Hello World");
+            subjectField.selectOption(new SelectOption().setIndex(2));
 
             assertThat(firstNameField).hasValue("Sara-Jane");
             assertThat(lastNameField).hasValue("Smith");
             assertThat(emailNameField).hasValue("example@example.com");
-
+            assertThat(subjectField).hasValue("webmaster");
 
         }
-
 
     }
 
