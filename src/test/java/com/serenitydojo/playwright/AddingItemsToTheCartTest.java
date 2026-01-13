@@ -6,13 +6,12 @@ import com.microsoft.playwright.options.AriaRole;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
-@UsePlaywright
-public class AddingToTheCartTest {
+@UsePlaywright(HeadlessChromeOptions.class)
+public class AddingItemsToTheCartTest {
 
     @DisplayName("Search for pliers")
     @Test
