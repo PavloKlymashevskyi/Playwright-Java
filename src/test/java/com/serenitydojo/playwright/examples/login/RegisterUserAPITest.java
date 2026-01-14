@@ -27,7 +27,7 @@ public class RegisterUserAPITest {
     void setup(Playwright playwright) {
         request = playwright.request().newContext(
                 new APIRequest.NewContextOptions()
-                        .setBaseURL("https://api.practicesoftwaretesting.com/api/documentation")
+                        .setBaseURL("https://api.practicesoftwaretesting.com")
         );
     }
 
