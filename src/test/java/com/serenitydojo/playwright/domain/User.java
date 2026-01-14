@@ -34,7 +34,7 @@ public record User(
         Faker fake = new Faker();
         return new User(
                 fake.name().firstName(),
-                fake.name().firstName(),
+                fake.name().lastName(),
                 Address.randomAddress(),
                 fake.phoneNumber().phoneNumber(),
                 "1975-01-01",
