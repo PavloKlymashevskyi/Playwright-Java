@@ -72,11 +72,45 @@ public class PlaywrightWaitsTest {
 
             page.waitForSelector(".card",
                     new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE)
-                    );
+            );
 
             var filteredProducts = page.getByTestId("product-name").allInnerTexts();
             Assertions.assertThat(filteredProducts).contains("Sheet Sander", "Belt Sander", "Circular Saw");
 
+        }
+    }
+
+    @Nested
+    class WaitingForElementsToAppearAndDisappear {
+        @BeforeEach
+        void openHomePage() {
+            page.navigate("https://practicesoftwaretesting.com");
+        }
+
+        @Test
+        @DisplayName("It should display a toaster message when an item is added to the cart")
+        void shouldDisplayToasterMessage() {
+            page.getByText("Bolt Cutter").click();
+            page.getByText("Add to cart").click();
+
+            // wait for the toaster message to appear
+            assertThat(page.getByRole(AriaRole.ALERT)).isVisible();
+            assertThat(page.getByRole(AriaRole.ALERT)).hasText("Product added to shopping cart.");
+
+            // check disappear
+            // page.waitForSelector(() -> page.getByRole(AriaRole.ALERT).isHidden());
+
+
+        }
+
+        @Test
+        @DisplayName("Should update the cart item count")
+        void shouldUpdateCartItemCount() {
+            page.getByText("Bolt Cutter").click();
+            page.getByText("Add to cart").click();
+
+            page.waitForCondition(() -> page.getByTestId("cart-quantity").textContent().equals("1"));
+            page.waitForSelector("[data-test=cart-quantity]:has-text('1')");
         }
     }
 }
