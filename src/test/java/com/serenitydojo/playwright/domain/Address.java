@@ -1,5 +1,6 @@
 package com.serenitydojo.playwright.domain;
 
+import com.google.gson.annotations.SerializedName;
 import net.datafaker.Faker;
 
 public record Address(
@@ -7,6 +8,7 @@ public record Address(
         String city,
         String state,
         String country,
+        @SerializedName("postal_code")
         String postalCode) {
 
     public static Address randomAddress() {
@@ -17,10 +19,6 @@ public record Address(
                 fake.address().state(),
                 fake.address().country(),
                 fake.address().postcode()
-
         );
     }
-
-)
-
 }

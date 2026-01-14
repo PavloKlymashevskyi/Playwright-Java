@@ -43,6 +43,18 @@ public record User(
         );
     }
 
+    public Object withPassword(String password) {
+        return new User(
+                first_name,
+                last_name,
+                address,
+                phone,
+                dob,
+                password,
+                email
+        );
+    }
+
 }
 
 
