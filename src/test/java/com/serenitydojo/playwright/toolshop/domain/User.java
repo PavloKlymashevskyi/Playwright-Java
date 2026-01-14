@@ -54,15 +54,15 @@ public record User(
         );
     }
 
-    public Object withPassword(String password) {
+    public User withPassword(String password) {
         return new User(
-                first_name,
-                last_name,
-                address,
-                phone,
-                dob,
+                this.first_name,
+                this.last_name,
+                this.address,
+                this.phone,
+                this.dob,
                 password,
-                email
+                this.email
         );
     }
 
