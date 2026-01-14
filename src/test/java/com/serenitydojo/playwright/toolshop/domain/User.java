@@ -19,6 +19,9 @@ package com.serenitydojo.playwright.domain;
 
 import net.datafaker.Faker;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 public record User(
         String first_name,
@@ -32,12 +35,20 @@ public record User(
 
     public static User randomUser() {
         Faker fake = new Faker();
+
+        // dob
+        int year = fake.number().numberBetween(1980, 2010);
+        int month = fake.number().numberBetween(1, 12);
+        int day = fake.number().numberBetween(1, 28);
+        LocalDate date = LocalDate.of(year, month, day);
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
         return new User(
                 fake.name().firstName(),
                 fake.name().lastName(),
                 Address.randomAddress(),
                 fake.phoneNumber().phoneNumber(),
-                "1975-01-01",
+                formattedDate,
                 "!123Test",
                 fake.internet().emailAddress()
         );

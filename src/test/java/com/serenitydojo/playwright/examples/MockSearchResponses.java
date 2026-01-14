@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright;
+package com.serenitydojo.playwright.examples;
 
 public class MockSearchResponses {
     public static final String RESPONSE_WITH_A_SINGLE_ENTRY = """

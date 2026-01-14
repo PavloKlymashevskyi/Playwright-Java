@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright.login;
+package com.serenitydojo.playwright.examples.login;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -7,8 +7,8 @@ import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.junit.UsePlaywright;
 import com.microsoft.playwright.options.RequestOptions;
-import com.serenitydojo.playwright.domain.Address;
-import com.serenitydojo.playwright.domain.User;
+import com.serenitydojo.playwright.toolshop.domain.Address;
+import com.serenitydojo.playwright.toolshop.domain.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

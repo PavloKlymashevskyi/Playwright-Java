@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright;
+package com.serenitydojo.playwright.examples;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;

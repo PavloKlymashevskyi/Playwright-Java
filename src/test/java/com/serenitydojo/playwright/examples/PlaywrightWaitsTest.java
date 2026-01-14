@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright;
+package com.serenitydojo.playwright.examples;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
