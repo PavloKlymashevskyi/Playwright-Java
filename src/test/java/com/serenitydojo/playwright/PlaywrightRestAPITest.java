@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 
 public class PlaywrightRestAPITest {
 
@@ -64,5 +66,51 @@ public class PlaywrightRestAPITest {
 
             Assertions.assertThat(productImageTitles).contains("Pliers", "Bolt Cutters", "Hammer");
         }
+    }
+
+    @DisplayName("Playwright allows us to mock out API")
+    @Nested
+    class MockingAPIResponse {
+
+        @Test
+        @DisplayName("When a search returns a single product")
+        void whenSingleItemIsFound() {
+
+            // products/search?q=Pliers
+            page.route("**/products/search?q=Pliers", route -> {
+                route.fulfill(
+                        new Route.FulfillOptions()
+                                .setBody(MockSearchResponses.RESPONSE_WITH_A_SINGLE_ENTRY)
+                                .setStatus(200)
+                );
+            });
+            page.navigate("https://practicesoftwaretesting.com");
+            page.getByPlaceholder("Search").fill("Pliers");
+            page.getByPlaceholder("Search").press("Enter");
+
+
+            assertThat(page.getByTestId("product-name")).hasCount(1);
+            assertThat(page.getByTestId("product-name")).hasText("Super Pliers");
+        }
+
+        @Test
+        @DisplayName("When a search returns no products")
+        void whenNoItemAreFound() {
+            // products/search?q=Pliers
+            page.route("**/products/search?q=Pliers", route -> {
+                route.fulfill(
+                        new Route.FulfillOptions()
+                                .setBody(MockSearchResponses.RESPONSE_WITH_NO_ENTRIES)
+                                .setStatus(200)
+                );
+            });
+            page.navigate("https://practicesoftwaretesting.com");
+            page.getByPlaceholder("Search").fill("Pliers");
+            page.getByPlaceholder("Search").press("Enter");
+
+            assertThat(page.getByTestId("product-name")).hasCount(0);
+            assertThat(page.getByTestId("search_completed")).hasText("There are no products found.");
+        }
+
     }
 }
