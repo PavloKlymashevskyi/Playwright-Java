@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright.domain;
+package com.serenitydojo.playwright.toolshop.domain;
 
 import com.google.gson.annotations.SerializedName;
 import net.datafaker.Faker;

@@ -1,4 +1,4 @@
-package com.serenitydojo.playwright.domain;
+package com.serenitydojo.playwright.toolshop.domain;
 
 // https://api.practicesoftwaretesting.com/api/documentation
 //{
@@ -41,7 +41,7 @@ public record User(
         int month = fake.number().numberBetween(1, 12);
         int day = fake.number().numberBetween(1, 28);
         LocalDate date = LocalDate.of(year, month, day);
-        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         return new User(
                 fake.name().firstName(),
