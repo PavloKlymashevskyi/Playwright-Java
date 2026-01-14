@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -111,6 +112,47 @@ public class PlaywrightWaitsTest {
 
             page.waitForCondition(() -> page.getByTestId("cart-quantity").textContent().equals("1"));
             page.waitForSelector("[data-test=cart-quantity]:has-text('1')");
+        }
+
+    }
+
+    @Nested
+    class WaitingForAPICalls {
+        @BeforeEach
+        void openHomePage() {
+            page.navigate("https://practicesoftwaretesting.com");
+        }
+
+        @Test
+        void sortByDescendingPrice() {
+
+            // Sort by descending
+            // https://api.practicesoftwaretesting.com/products?sort=name,asc&between=price,1,100&page=0
+//            page.waitForResponse("**/products?sort**",
+//                    () -> {
+//                        page.getByTestId("sort").selectOption("Price (High - Low)");
+//                        //page.getByTestId("product-price").first().waitFor();
+//                    });
+
+            page.getByTestId("sort").selectOption("Price (High - Low)");
+            page.getByTestId("product-price").first().waitFor();
+
+            // Find all the prices on the page
+            var productPrices = page.getByTestId("product-price")
+                    .allInnerTexts()
+                    .stream()
+                    .map(WaitingForAPICalls::extractPrice)
+                    .toList();
+
+            // Are the prices in the correct order
+            System.out.println("ProductPrices: " + productPrices);
+            Assertions.assertThat(productPrices)
+                    .isNotEmpty()
+                    .isSortedAccordingTo(Comparator.reverseOrder());
+        }
+
+        private static double extractPrice(String price) {
+            return Double.parseDouble(price.replace("$", ""));
         }
     }
 }
