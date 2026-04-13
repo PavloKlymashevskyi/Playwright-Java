@@ -1,19 +1,18 @@
-package com.serenitydojo.playwright.examples;
-
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
-import com.serenitydojo.playwright.toolshop.domain.User;
-import com.serenitydojo.playwright.toolshop.login.LoginPage;
-import com.serenitydojo.playwright.toolshop.login.UserAPIClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+@Execution(ExecutionMode.SAME_THREAD)
 public class PageObjectTest {
+
     protected static Playwright playwright;
     protected static Browser browser;
     protected static BrowserContext browserContext;
@@ -49,97 +48,135 @@ public class PageObjectTest {
 
     @BeforeEach
     void openHomePage() {
-//        // Login via login page // rolland.rath@yahoo.com
-//        page.navigate("https://practicesoftwaretesting.com/auth/login");
-//        page.getByPlaceholder("Your email").fill("rolland.rath@yahoo.com");
-//        page.getByPlaceholder("Your password").fill("!123Test");
-//        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Login")).click();
-
         page.navigate("https://practicesoftwaretesting.com");
     }
 
+    @Nested
+    class WhenSearchingProductsByKeyword {
 
-    @DisplayName("Without Page Objects")
-    @Test
-    void withoutPageObjects() {
-        // Search for pliers
-        page.waitForResponse("**/products/search?q=pliers", () -> {
-            page.getByPlaceholder("Search").fill("pliers");
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Search")).click();
-        });
-        // Show details page
-        page.locator(".card").getByText("Combination Pliers").click();
+        @DisplayName("Without Page Objects")
+        @Test
+        void withoutPageObjects() {
+            page.waitForResponse("**/products/search?q=tape", () -> {
+                page.getByPlaceholder("Search").fill("tape");
+                page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Search")).click();
+            });
+            List<String> matchingProducts = page.getByTestId("product-name").allInnerTexts();
+            Assertions.assertThat(matchingProducts)
+                    .contains("Tape Measure 7.5m", "Measuring Tape", "Tape Measure 5m");
 
-        // Increase cart quanity
-        page.getByTestId("increase-quantity").click();
-        page.getByTestId("increase-quantity").click();
-        // Add to cart
-        page.getByText("Add to cart").click();
-        page.waitForCondition(() -> page.getByTestId("cart-quantity").textContent().equals("3"));
+        }
 
-        // Open the cart
-        page.getByTestId("nav-cart").click();
+        @DisplayName("With Page Objects")
+        @Test
+        void withPageObjects() {
+            SearchComponent searchComponent = new SearchComponent(page);
+            ProductList productList = new ProductList(page);
 
-        // check cart contents
-        assertThat(page.locator(".product-title").getByText("Combination Pliers")).isVisible();
-        assertThat(page.getByTestId("cart-quantity").getByText("3")).isVisible();
+            searchComponent.searchBy("tape");
+
+            var matchingProducts = productList.getProductNames();
+
+            Assertions.assertThat(matchingProducts).contains("Tape Measure 7.5m", "Measuring Tape", "Tape Measure 5m");
+
+        }
     }
 
-
-    @DisplayName("Without Page Object")
-    @Test
-    void withoutPageObject() {
-        page.waitForResponse("**/products/search?q=tape", () -> {
-            page.getByPlaceholder("Search").fill("tape");
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Search")).click();
-        });
-
-        List<String> matchingProducts = page.getByTestId("product-name").allInnerTexts();
-        Assertions.assertThat(matchingProducts)
-                .contains("Tape Measure 7.5m", "Measuring Tape", "Tape Measure 5m");
-    }
-
-    @DisplayName("With Page Objects")
-    @Test
-    void withPageObjects() {
-        SearchComponent searchComponent = new SearchComponent(page);
-        ProductList productList = new ProductList(page);
-        searchComponent.searchBy("tape");
-
-        var matchingProducts = productList.getProductNames();
-
-        Assertions.assertThat(matchingProducts).contains("Tape Measure 7.5m", "Measuring Tape", "Tape Measure 5m");
-    }
+    @Nested
+    class WhenAddingItemsToTheCart {
 
 
-    @Test
-    void withPageObjectsPliers() {
-        // login before run
-        SearchComponent searchComponent = new SearchComponent(page);
-        ProductList productList = new ProductList(page);
-        ProductDetails productDetails = new ProductDetails(page);
-        NavBar navbar = new NavBar(page);
-        CheckoutCart checkoutCart = new CheckoutCart(page);
+        SearchComponent searchComponent;
+        ProductList productList;
+        ProductDetails productDetails;
+        NavBar navBar;
+        CheckoutCart checkoutCart;
 
-        searchComponent.searchBy("pliers");
-        productList.viewProductDetails("Combination Pliers");
+        @BeforeEach
+        void setUp() {
+            searchComponent = new SearchComponent(page);
+            productList = new ProductList(page);
+            productDetails = new ProductDetails(page);
+            navBar = new NavBar(page);
+            checkoutCart = new CheckoutCart(page);
+        }
 
-        productDetails.increaseQuantityTo(2);
-        productDetails.addToCard();
-        navbar.openCart();
+        @DisplayName("Without Page Objects")
+        @Test
+        void withoutPageObjects() {
+            // Search for pliers
+            page.waitForResponse("**/products/search?q=pliers", () -> {
+                page.getByPlaceholder("Search").fill("pliers");
+                page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Search")).click();
+            });
+            // Show details page
+            page.locator(".card").getByText("Combination Pliers").click();
 
-        List<CartLineItem> lineItems = checkoutCart.getLineItems();
+            // Increase cart quanity
+            page.getByTestId("increase-quantity").click();
+            page.getByTestId("increase-quantity").click();
+            // Add to cart
+            page.getByText("Add to cart").click();
+            page.waitForCondition(() -> page.getByTestId("cart-quantity").textContent().equals("3"));
 
-        Assertions.assertThat(lineItems)
-                .hasSize(1)
-                .first()
-                .satisfies(item -> {
-                    Assertions.assertThat(item.title()).contains("Combination Pliers");
-                    Assertions.assertThat(item.quantity).isEqualTo(3);
-                    Assertions.assertThat(item.total).isEqualTo(item.quantity * item.price());
-                });
+            // Open the cart
+            page.getByTestId("nav-cart").click();
 
+            // check cart contents
+            assertThat(page.locator(".product-title").getByText("Combination Pliers")).isVisible();
+            assertThat(page.getByTestId("cart-quantity").getByText("3")).isVisible();
+        }
 
+        @Test
+        void withPageObjects() {
+            searchComponent.searchBy("pliers");
+            productList.viewProductDetails("Combination Pliers");
+
+            productDetails.increaseQuanityBy(2);
+            productDetails.addToCart();
+
+            navBar.openCart();
+
+            List<CartLineItem> lineItems = checkoutCart.getLineItems();
+
+            Assertions.assertThat(lineItems)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(item -> {
+                        Assertions.assertThat(item.title()).contains("Combination Pliers");
+                        Assertions.assertThat(item.quantity()).isEqualTo(3);
+                        Assertions.assertThat(item.total()).isEqualTo(item.quantity() * item.price());
+                    });
+        }
+
+        @Test
+        void whenCheckingOutMultipleItems() {
+            navBar.openHomePage();
+            productList.viewProductDetails("Bolt Cutters");
+            productDetails.increaseQuanityBy(2);
+            productDetails.addToCart();
+
+            navBar.openHomePage();
+            productList.viewProductDetails("Slip Joint Pliers");
+            productDetails.addToCart();
+
+            navBar.openCart();
+
+            List<CartLineItem> lineItems = checkoutCart.getLineItems();
+
+            Assertions.assertThat(lineItems).hasSize(2);
+            List<String> productNames = lineItems.stream().map(CartLineItem::title).toList();
+            Assertions.assertThat(productNames).contains("Bolt Cutters","Slip Joint Pliers");
+
+            Assertions.assertThat(lineItems)
+                    .allSatisfy(item -> {
+                        Assertions.assertThat(item.quantity()).isGreaterThanOrEqualTo(1);
+                        Assertions.assertThat(item.price()).isGreaterThan(0.0);
+                        Assertions.assertThat(item.total()).isGreaterThan(0.0);
+                        Assertions.assertThat(item.total()).isEqualTo(item.quantity() * item.price());
+                    });
+
+        }
     }
 
     class SearchComponent {
@@ -181,23 +218,26 @@ public class PageObjectTest {
             this.page = page;
         }
 
-        public void increaseQuantityTo(int increment) {
-            for(int i = 1; i <= increment; i++) {
+        public void increaseQuanityBy(int increment) {
+            for (int i = 1; i <= increment; i++) {
                 page.getByTestId("increase-quantity").click();
             }
         }
 
-        public void     addToCard() {
-            // https://api.practicesoftwaretesting.com/carts
-            page.waitForResponse(response -> response.url().contains("/carts") && response.request().method().equals("POST"),
-                    () -> page.getByText("Add to cart"));
-            page.getByText("Add to cart").click();
-//            page.waitForCondition(() -> page.getByTestId("cart-quantity").textContent().equals("3"));
+        public void addToCart() {
+            page.waitForResponse(
+                    response -> response.url().contains("/carts") && response.request().method().equals("POST"),
+                    () -> {
+                        page.getByText("Add to cart").click();
+                        page.getByRole(AriaRole.ALERT).click();
+                    }
+            );
         }
     }
 
     class NavBar {
         private final Page page;
+
         NavBar(Page page) {
             this.page = page;
         }
@@ -205,34 +245,42 @@ public class PageObjectTest {
         public void openCart() {
             page.getByTestId("nav-cart").click();
         }
+
+        public void openHomePage() {
+            page.navigate("https://practicesoftwaretesting.com");
+        }
     }
 
     record CartLineItem(String title, int quantity, double price, double total) {}
 
     class CheckoutCart {
         private final Page page;
-
         CheckoutCart(Page page) {
             this.page = page;
         }
-    public List<CartLineItem> getLineItems() {
-        page.locator("app-cart body tr").waitFor();
-        return page.locator("app-cart body tr")
-            .all()
-            .stream()
-            .map(
-                    row -> {
-                        String title = row.getByTestId("product-title").innerText();
-                        int quantity = Integer.parseInt(row.getByTestId("product-quantity").inputValue());
-                        double price = Double.parseDouble(price(row.getByTestId("product-price").innerText()));
-                        double linePrice = Double.parseDouble(price(row.getByTestId("line-price").innerText()));
-                        return new CartLineItem(title, quantity, price, linePrice);
-                    }
-            ).toList();
+
+        public List<CartLineItem> getLineItems() {
+            page.locator("app-cart tbody tr").first().waitFor();
+            return page.locator("app-cart tbody tr")
+                    .all()
+                    .stream()
+                    .map(
+                            row -> {
+                                String title = trimmed(row.getByTestId("product-title").innerText());
+                                int quantity = Integer.parseInt(row.getByTestId("product-quantity").inputValue());
+                                double price = Double.parseDouble(price(row.getByTestId("product-price").innerText()));
+                                double linePrice = Double.parseDouble(price(row.getByTestId("line-price").innerText()));
+                                return new CartLineItem(title, quantity, price, linePrice);
+                            }
+                    ).toList();
+        }
+
+        private String trimmed(String value) {
+            return value.strip().replaceAll("\u00A0", "");
         }
     }
 
     private String price(String value) {
-        return value.replace("$", "");
+        return value.replace("$","");
     }
 }
